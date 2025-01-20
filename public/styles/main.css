@@ -42,6 +42,7 @@ td.right-side {
     box-sizing: border-box;
     width: 100%;
     overflow: hidden;
+    padding-bottom: 50px;
 }
 
 .container {

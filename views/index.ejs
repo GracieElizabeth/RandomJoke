@@ -19,12 +19,16 @@
 
             <% if(locals.error) { %>
                 <%= error %>
-            <% } else { %>
+            <% } else if (locals.setup && locals.delivery){ %>
                 <%= setup %>
                 <br>
                 <%= delivery %>
-            <%  } %>
-        </div>
+            <% } else if(locals.joke) { %>
+                <%= joke %>
+            <% } else { %>
+                <%= message %>
+            <% } %>
+                </div>
         
         <div>
             <form action="/" id="form" class="form" method="POST">
@@ -92,27 +96,7 @@
                         <td class="right-side">
                             <div class="multiselect noselect" id="typeSelectWrapper" style="border-color: initial;">
                                 <input type="checkbox" name="jokeTypes" value="single" checked><label for="typ-cb1">single</label>
-                                <input type="checkbox" name="jokeTypes" value="twopart" checked><label for="typ-cb2">twopart</label>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="left-side">
-                            Search for a joke that contains:
-                        </td>
-                        <td class="right-side">
-                            <div class="multiselect noselect">
-                                <input type="text" name="searchString" placeholder="(optional)">
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="left-side">
-                            Amount of jokes (10 max):
-                        </td>
-                        <td class="right-side">
-                            <div class="multiselect noselect" id="jokeAmountWrapper" style="border-color: initial;">
-                                <input type="number" name="jokeAmount" id="jokesAmountInput" value="1" min="1" step="1" max="10">
+                                <input type="checkbox" name="jokeTypes" value="twopart" checked><label for="typ-cb2">two part</label>
                             </div>
                         </td>
                     </tr>
@@ -161,14 +145,6 @@
                 checkbox.disabled = false;
             });
         }
-    });
-
-    // Ensures JokesAmount is within valid range
-    jokesAmountInput.addEventListener("change", function() {
-        if (jokesAmountInput.value > 10)
-            jokesAmountInput.value = 10;
-        else if (jokesAmountInput.value < 1)  // Ensure it's at least 1
-            jokesAmountInput.value = 1;
     });
 
     function validateForm(event) {
