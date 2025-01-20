@@ -1,0 +1,78 @@
+html {
+    height: 100%;
+}
+
+body {
+    font-family: "Roboto", serif;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+h1 {
+    width: 100%;
+    margin-bottom: 40px;
+    text-align: center;
+}
+
+tr {
+    display: flex;
+    margin-bottom: 20px;
+}
+
+td {
+    display: flex;
+}
+
+td.left-side {
+    min-width: 300px;
+}
+
+td.right-side {
+    flex-grow: 1;
+    border: 2px solid rgb(176, 176, 176);
+    border-radius: 5px;
+    padding: 0.5em;
+}
+
+#head {
+    height: 100%;
+    text-align: center;
+    padding: 20px;
+    box-sizing: border-box;
+    width: 100%;
+    overflow: hidden;
+}
+
+.container {
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    padding: 0 20px;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 1.5rem; /* Reduce font size of the header */
+    }
+
+    tr {
+        display: block;
+    }
+
+    td.left-side, td.right-side {
+        width: 100%; /* Make both columns full width on smaller screens */
+        display: block; /* Stack the columns */
+    }
+
+    .multiselect {
+        width: 100%; /* Ensure inputs and select elements take full width */
+    }
+
+    .container {
+        padding: 1px; /* Reduce padding on smaller screens */
+    }
+}

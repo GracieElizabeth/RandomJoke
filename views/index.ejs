@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles/main.css">
+  <script src="index.js"></script>
+  <title>Random Joke Generator</title>
+</head>
+
+<body>
+    <div class="container">
+        <div id="head">
+            <h1>Generate A Random Joke 😁</h1>
+
+            <% if(locals.error) { %>
+                <%= error %>
+            <% } else { %>
+                <%= setup %>
+                <br>
+                <%= delivery %>
+            <%  } %>
+        </div>
+        
+        <div>
+            <form action="/" id="form" class="form" method="POST">
+                <table>
+                    <tbody>
+                    <tr>
+                        <td id="catSelect" class="left-side">
+                            Select category / categories:
+                        </td>
+                        <td class="right-side">
+                            <div class="multiselect noselect" id="categoryWrapper" style="border-color: initial;">
+                                <div>
+                                    <input type="radio" name="catSelect" value="any" id="cat-radio1" checked><label for="cat-radio1">Any</label>
+                                </div>
+                                <div>
+                                    <input type="radio" name="catSelect" value="multi" id="cat-radio2"><label for="cat-radio2">Custom:</label>
+                                    <span id="catSelectMulti">
+                                        <input type="checkbox" name="categories" value="Programming"><label for="cat-cb1">Programming</label>
+                                        <input type="checkbox" name="categories" value="Misc"><label for="cat-cb2">Misc</label>
+                                        <input type="checkbox" name="categories" value="Dark"><label for="cat-cb3">Dark</label>
+                                        <input type="checkbox" name="categories" value="Pun"><label for="cat-cb4">Pun</label>
+                                        <input type="checkbox" name="categories" value="Spooky"><label for="cat-cb5">Spooky</label>
+                                        <input type="checkbox" name="categories" value="Christmas"><label for="cat-cb6">Christmas</label>
+                                    </span>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="left-side">
+                            Select language:
+                        </td>
+                        <td class="right-side">
+                            <div class="multiselect noselect">
+                                <select id="lcodeSelect" name="language" class="appendLangOpts">
+                                    <option value="cs">cs - Czech</option>
+                                    <option value="de">de - German</option>
+                                    <option value="en" selected>en - English</option>
+                                    <option value="es">es - Spanish</option>
+                                    <option value="fr">fr - French</option>
+                                    <option value="pt">pt - Portuguese</option>
+                                </select>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="left-side">
+                            Select flags to blacklist (optional):
+                        </td>
+                        <td class="right-side">
+                            <div class="multiselect noselect">
+                                <input type="checkbox" name="blacklistFlags" value="nsfw"><label for="blf-cb1">nsfw</label>
+                                <input type="checkbox" name="blacklistFlags" value="religious"><label for="blf-cb2">religious</label>
+                                <input type="checkbox" name="blacklistFlags" value="political"><label for="blf-cb3">political</label>
+                                <input type="checkbox" name="blacklistFlags" value="racist"><label for="blf-cb4">racist</label>
+                                <input type="checkbox" name="blacklistFlags" value="sexist"><label for="blf-cb5">sexist</label>
+                                <input type="checkbox" name="blacklistFlags" value="explicit"><label for="blf-cb6">explicit</label>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="left-side">
+                            Select at least one joke type:
+                        </td>
+                        <td class="right-side">
+                            <div class="multiselect noselect" id="typeSelectWrapper" style="border-color: initial;">
+                                <input type="checkbox" name="jokeTypes" value="single" checked><label for="typ-cb1">single</label>
+                                <input type="checkbox" name="jokeTypes" value="twopart" checked><label for="typ-cb2">twopart</label>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="left-side">
+                            Search for a joke that contains:
+                        </td>
+                        <td class="right-side">
+                            <div class="multiselect noselect">
+                                <input type="text" name="searchString" placeholder="(optional)">
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="left-side">
+                            Amount of jokes (10 max):
+                        </td>
+                        <td class="right-side">
+                            <div class="multiselect noselect" id="jokeAmountWrapper" style="border-color: initial;">
+                                <input type="number" name="jokeAmount" id="jokesAmountInput" value="1" min="1" step="1" max="10">
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+                </table>
+                <input type="submit" value="Submit" onclick="validateForm(event)">
+            </form>            
+        </div>
+    </div>
+</body>
+</html>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+    const catRadio1 = document.getElementById("cat-radio1");
+    const catRadio2 = document.getElementById("cat-radio2");
+    const changeColorButton = document.getElementById("changeColorButton");
+    const catCheckboxes = document.querySelectorAll("#catSelectMulti input[type='checkbox']");
+    const jokeTypesCheckboxes = document.querySelectorAll("#typeSelectWrapper input[name='jokeTypes']");
+    const jokesAmountInput = document.getElementById("jokesAmountInput");
+    // Get the td element containing the radio button cat2
+    const catRadio2Td = document.querySelector("#cat-radio2").closest("td");
+    const jokeTypesTd = document.querySelector("#typeSelectWrapper").closest("td");
+    let isCat2Checked = false;
+    let isJokeTypesChecked = false;
+
+    // Initially disable checkboxes if "Any" is selected
+    if (catRadio1.checked) {
+        catCheckboxes.forEach(checkbox => {
+            checkbox.disabled = true;
+        });
+    }
+
+    // Listen for changes on the radio buttons
+    catRadio1.addEventListener("change", function() {
+        if (catRadio1.checked) {
+            catCheckboxes.forEach(checkbox => {
+                checkbox.disabled = true;
+            });
+        } 
+    });
+
+    catRadio2.addEventListener("change", function() {
+        if (catRadio2.checked) {
+            catCheckboxes.forEach(checkbox => {
+                checkbox.disabled = false;
+            });
+        }
+    });
+
+    // Ensures JokesAmount is within valid range
+    jokesAmountInput.addEventListener("change", function() {
+        if (jokesAmountInput.value > 10)
+            jokesAmountInput.value = 10;
+        else if (jokesAmountInput.value < 1)  // Ensure it's at least 1
+            jokesAmountInput.value = 1;
+    });
+
+    function validateForm(event) {
+    // Initialize flags for category and joke types validation
+    let isCat2Checked = false;
+    let isJokeTypesChecked = false;
+
+    // Flag to track if any validation fails
+    let hasErrors = false;
+
+    // Check Category selection
+    if (!catRadio1.checked) {
+        catCheckboxes.forEach((catCheckbox) => {
+            if (!catCheckbox.disabled && catCheckbox.checked) {
+                isCat2Checked = true;
+                catRadio2Td.style.borderColor = "";  // Reset the border color if valid
+            }
+        });
+
+        if (!isCat2Checked) {
+            catRadio2Td.style.borderColor = "red";  // Set border color to red if not checked
+            hasErrors = true;
+        }
+    }
+
+    // Check Joke Types selection
+    jokeTypesCheckboxes.forEach((jokesCheckbox) => {
+        if (jokesCheckbox.checked) {
+            isJokeTypesChecked = true;
+            jokeTypesTd.style.borderColor = "";  // Reset the border color if valid
+        }
+    });
+
+    if (!isJokeTypesChecked) {
+        jokeTypesTd.style.borderColor = "red";  // Set border color to red if not checked
+        hasErrors = true;
+    }
+
+    // If there are any errors, prevent form submission and alert the user
+    if (hasErrors) {
+        event.preventDefault();  // Prevent form submission
+        alert("Please check the required red boxes.");
+        return false;  // Form validation failed
+    }
+
+    return true;  // Form validation passed
+}
+
+    // Bind the validateForm to the form's submit event
+    const form = document.getElementById("form");
+    form.addEventListener("submit", validateForm);
+});
+</script>
